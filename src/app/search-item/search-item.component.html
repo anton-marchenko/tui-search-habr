@@ -1,0 +1,9 @@
+<a tuiCell [href]="item.data?.href" [class.disabled]="item.loading">
+  <tui-avatar
+    [src]="item.data?.icon || '@tui.file'"
+    [tuiSkeleton]="!!item.loading" />
+  <span tuiTitle>
+    <span [tuiSkeleton]="!!item.loading">{{ item.data?.title }}</span>
+    <span tuiSubtitle>{{ item.loading ? '' : item.data?.subtitle }}</span>
+  </span>
+</a>
