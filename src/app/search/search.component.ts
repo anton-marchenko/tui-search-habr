@@ -30,7 +30,7 @@ export class SearchComponent {
   private searchService = inject(SearchService);
   private readonly debounceTimeBeforeSearchRequest = 300;
 
-  protected readonly popular = ['Taiga UI', 'Maskito', 'Anton'];
+  protected readonly popular = ['Anton', 'Taiga', 'Git'];
 
   protected readonly control = new FormControl('');
 

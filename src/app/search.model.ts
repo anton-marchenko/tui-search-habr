@@ -1,8 +1,7 @@
 export interface ExtraSearchServiceDto {
-  id: number;
+  sourceId: string;
   name: string;
   priority: number;
-  delay: number; // MOCK
 }
 
 interface SearchItemDto {

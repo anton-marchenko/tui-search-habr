@@ -22,7 +22,7 @@ const MAIN_SEARCH_LOADING_STATE: SearchResult = {
   providedIn: 'root',
 })
 export class SearchApiService {
-  private readonly http = inject(HttpClient);
+  // private readonly http = inject(HttpClient);
 
   makeMainSearch$(query: string) {
     const q1 = of(query).pipe(
@@ -44,9 +44,9 @@ export class SearchApiService {
     source: ExtraSearchServiceDto
   ) {
     const result$ = of(query).pipe(
-      delay(source.delay),
+      delay(100),
       map(value => {
-        if (source.id === 22) {
+        if (source.sourceId === 'code') {
           throw new Error('xxx');
         }
 
