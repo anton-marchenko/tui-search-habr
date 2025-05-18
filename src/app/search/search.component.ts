@@ -14,7 +14,6 @@ import { SearchService } from './search.service';
   selector: 'app-search',
   imports: [
     AsyncPipe,
-    JsonPipe,
     ReactiveFormsModule,
     TuiInputSearch,
     TuiNavigation,
