@@ -4,7 +4,7 @@ export interface ExtraSearchServiceDto {
   priority: number;
 }
 
-interface SearchItemDto {
+export interface SearchItemDto {
   title: string;
   subtitle?: string;
   href: string;

@@ -1,12 +1,15 @@
-import { Injectable } from '@angular/core';
-import { EXTRA_SEARCH_SERVICES } from './mock-data';
+import { inject, Injectable } from '@angular/core';
 import { catchError, map, of, ReplaySubject, timeout } from 'rxjs';
 import { ExtraSearchServiceDto } from '../search.model';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExtraSearchPriorityService {
+  private readonly baseUrl =
+    'https://my-json-server.typicode.com/anton-marchenko/tui-search-jsons';
+  private readonly http = inject(HttpClient);
   private readonly searchTimeout = 500;
   private cached = false;
 
@@ -26,12 +29,12 @@ export class ExtraSearchPriorityService {
   }
 
   private fetchData$() {
-    // todo mock backend json github
-    return of(EXTRA_SEARCH_SERVICES).pipe(
-      timeout(this.searchTimeout), // backend SLA
-      // tap(x => console.log('1=', JSON.stringify(x))),
-      map(items => items.sort((a, b) => a.priority - b.priority)),
-      catchError(() => of<ExtraSearchServiceDto[]>([])) // graceful degradation (extra search just will be hidden)
-    );
+    return this.http
+      .get<ExtraSearchServiceDto[]>(`${this.baseUrl}/extra-search-sources`)
+      .pipe(
+        timeout(this.searchTimeout), // backend SLA
+        map(items => items.sort((a, b) => a.priority - b.priority)),
+        catchError(() => of<ExtraSearchServiceDto[]>([])) // graceful degradation (extra search just will be hidden)
+      );
   }
 }

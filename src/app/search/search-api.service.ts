@@ -1,9 +1,15 @@
 import { inject, Injectable } from '@angular/core';
-import { ExtraSearchServiceDto, SearchItemResult, SearchResult } from '../search.model';
-import { EXTRA_SEARCH_DATA, MAIN_SEARCH_DATA } from './mock-data';
+import {
+  ExtraSearchServiceDto,
+  SearchItemResult,
+  SearchResult,
+  SearchItemDto,
+} from '../search.model';
 import { TUI_DEFAULT_MATCHER } from '@taiga-ui/cdk';
 import { catchError, delay, map, of, startWith } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+
+type MainSearchResultDto = Record<string, readonly SearchItemDto[]>;
 
 const LOADING_ITEM: SearchItemResult = {
   loading: true,
@@ -22,55 +28,62 @@ const MAIN_SEARCH_LOADING_STATE: SearchResult = {
   providedIn: 'root',
 })
 export class SearchApiService {
-  // private readonly http = inject(HttpClient);
+  private readonly baseUrl =
+    'https://my-json-server.typicode.com/anton-marchenko/tui-search-jsons';
+  private readonly http = inject(HttpClient);
 
   makeMainSearch$(query: string) {
-    const q1 = of(query).pipe(
-      delay(3000),
-      map(value => this.filter(value, MAIN_SEARCH_DATA)),
-      // map((x) => {
-      //   throw new Error('xxx');
-
-      //   return x;
-      // }),
-      startWith<SearchResult>(MAIN_SEARCH_LOADING_STATE)
-    );
-
-    return q1;
+    return this.http
+      .get<MainSearchResultDto>(`${this.baseUrl}/main-search?q=${query}`)
+      .pipe(
+        delay(3000),
+        map(result =>
+          Object.entries(result).reduce(
+            (acc, [key, data]) => ({
+              ...acc,
+              [key]: data.map(item => ({ data: item })),
+            }),
+            {} as SearchResult
+          )
+        ),
+        map(result => this.filter(query, result)), // search immitation (because json-server can only filter arrays, not objects)
+        startWith<SearchResult>(MAIN_SEARCH_LOADING_STATE)
+      );
   }
 
   public makeSearchFromExtraService$(
     query: string,
     source: ExtraSearchServiceDto
   ) {
-    const result$ = of(query).pipe(
-      delay(100),
-      map(value => {
-        if (source.sourceId === 'code') {
-          throw new Error('xxx');
-        }
+    const result$ = this.http
+      .get<
+        SearchItemDto[]
+      >(`${this.baseUrl}/extra-search__${source.sourceId}?q=${query}`)
+      .pipe(
+        delay(100),
+        map(value => {
+          if (source.sourceId === 'code') {
+            throw new Error('xxx');
+          }
 
-        return this.filter(value, {
-          [source.name]: EXTRA_SEARCH_DATA[source.name],
-        });
-      }),
-      startWith<SearchResult>({
-        [source.name]: [LOADING_ITEM],
-      }),
-      catchError(() => {
-        return of<SearchResult>({
-          [source.name]: [],
-        });
-      })
-    );
+          return {
+            [source.name]: value.map(data => ({ data })),
+          };
+        }),
+        startWith<SearchResult>({
+          [source.name]: [LOADING_ITEM],
+        }),
+        catchError(() => {
+          return of<SearchResult>({
+            [source.name]: [],
+          });
+        })
+      );
 
     return result$;
   }
 
-  private filter(
-    query: string,
-    data: SearchResult
-  ): SearchResult {
+  private filter(query: string, data: SearchResult): SearchResult {
     return Object.entries(data).reduce(
       (result, [key, value]) => ({
         ...result,
