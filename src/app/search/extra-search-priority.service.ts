@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, map, of, ReplaySubject, timeout } from 'rxjs';
-import { ExtraSearchServiceDto } from '../search.model';
+import { ExtraSearchSourceDto } from '../search.model';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class ExtraSearchPriorityService {
   private readonly http = inject(HttpClient);
   private cached = false;
 
-  private readonly sourceSub = new ReplaySubject<ExtraSearchServiceDto[]>(1);
+  private readonly sourceSub = new ReplaySubject<ExtraSearchSourceDto[]>(1);
   public readonly extraSearchServices$ = this.sourceSub.asObservable();
 
   loadDataOnce() {
@@ -29,11 +29,11 @@ export class ExtraSearchPriorityService {
 
   private fetchData$() {
     return this.http
-      .get<ExtraSearchServiceDto[]>(`${this.baseUrl}/extra-search-sources`)
+      .get<ExtraSearchSourceDto[]>(`${this.baseUrl}/extra-search-sources`)
       .pipe(
         timeout(900), // Отменит запрос если он дольше 900мс
         map(items => items.sort((a, b) => a.priority - b.priority)),
-        catchError(() => of<ExtraSearchServiceDto[]>([])) // отключит extra-search
+        catchError(() => of<ExtraSearchSourceDto[]>([])) // отключит extra-search
       );
   }
 }

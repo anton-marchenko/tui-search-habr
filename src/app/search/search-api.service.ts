@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import {
-  ExtraSearchServiceDto,
+  ExtraSearchSourceDto,
   SearchItemResult,
   SearchResult,
   SearchItemDto,
@@ -52,7 +52,7 @@ export class SearchApiService {
 
   public makeSearchFromExtraService$(
     query: string,
-    source: ExtraSearchServiceDto
+    source: ExtraSearchSourceDto
   ) {
     const result$ = this.http
       .get<
@@ -61,14 +61,14 @@ export class SearchApiService {
       .pipe(
         delay(2000),
         map(value => ({
-          [source.name]: value.map(data => ({ data })),
+          [source.sectionName]: value.map(data => ({ data })),
         })),
         startWith<SearchResult>({
-          [source.name]: [LOADING_ITEM],
+          [source.sectionName]: [LOADING_ITEM],
         }),
         catchError(() => {
           return of<SearchResult>({
-            [source.name]: [],
+            [source.sectionName]: [],
           });
         })
       );

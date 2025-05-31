@@ -1,6 +1,6 @@
-export interface ExtraSearchServiceDto {
+export interface ExtraSearchSourceDto {
   sourceId: string;
-  name: string;
+  sectionName: string;
   priority: number;
 }
 
