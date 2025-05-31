@@ -8,7 +8,6 @@ import { SearchItemResult } from '../search.model';
   selector: 'app-search-item',
   imports: [TuiAvatar, TuiCell, TuiTitle, TuiSkeleton],
   templateUrl: './search-item.component.html',
-  styleUrl: './search-item.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchItemComponent {

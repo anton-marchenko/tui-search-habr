@@ -1,9 +1,17 @@
-<a tuiCell [href]="item.data?.href" [class.disabled]="item.loading">
-  <tui-avatar
-    [src]="item.data?.icon || '@tui.file'"
-    [tuiSkeleton]="!!item.loading" />
-  <span tuiTitle>
-    <span [tuiSkeleton]="!!item.loading">{{ item.data?.title }}</span>
-    <span tuiSubtitle>{{ item.loading ? '' : item.data?.subtitle }}</span>
-  </span>
-</a>
+@if (item.loading) {
+  <div tuiCell>
+    <tui-avatar src="@tui.file" [tuiSkeleton]="true" />
+    <span tuiTitle>
+      <span [tuiSkeleton]="true">xxxxxxxxxxxxxxxxx</span>
+    </span>
+  </div>
+} @else {
+  <a tuiCell [href]="item.data?.href">
+    <tui-avatar
+      [src]="item.data?.icon || '@tui.file'"/>
+    <span tuiTitle>
+      <span>{{ item.data?.title }}</span>
+      <span tuiSubtitle>{{ item.data?.subtitle }}</span>
+    </span>
+  </a>
+}
