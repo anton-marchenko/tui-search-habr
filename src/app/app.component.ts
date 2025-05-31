@@ -1,15 +1,9 @@
 import { TuiRoot } from '@taiga-ui/core';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SearchComponent } from './search/search.component';
 import { TuiAvatar } from '@taiga-ui/kit';
 import { TuiNavigation } from '@taiga-ui/layout';
-import { ExtraSearchPriorityService } from './search/extra-search-priority.service';
 
 @Component({
   selector: 'app-root',
@@ -17,12 +11,4 @@ import { ExtraSearchPriorityService } from './search/extra-search-priority.servi
   templateUrl: './app.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit {
-  private readonly extraSearchPriorityService = inject(
-    ExtraSearchPriorityService
-  );
-
-  ngOnInit(): void {
-    this.extraSearchPriorityService.loadDataOnce();
-  }
-}
+export class AppComponent {}

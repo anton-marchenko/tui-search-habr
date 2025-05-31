@@ -4,10 +4,11 @@ import {
   SearchItemResult,
   SearchResult,
   SearchItemDto,
-} from '../search.model';
+} from './search.model';
 import { TUI_DEFAULT_MATCHER } from '@taiga-ui/cdk';
 import { catchError, delay, map, of, startWith } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { API_BASE_URL } from './search.constants';
 
 type MainSearchResultDto = Record<string, readonly SearchItemDto[]>;
 
@@ -28,8 +29,7 @@ const MAIN_SEARCH_LOADING_STATE: SearchResult = {
   providedIn: 'root',
 })
 export class SearchApiService {
-  private readonly baseUrl =
-    'https://my-json-server.typicode.com/anton-marchenko/tui-search-jsons';
+  private readonly baseUrl = API_BASE_URL;
   private readonly http = inject(HttpClient);
 
   makeMainSearch$(query: string) {
@@ -50,11 +50,11 @@ export class SearchApiService {
       );
   }
 
-  public makeSearchFromExtraService$(
+  public makeSearchFromExtraSource$(
     query: string,
     source: ExtraSearchSourceDto
   ) {
-    const result$ = this.http
+    return this.http
       .get<
         SearchItemDto[]
       >(`${this.baseUrl}/extra-search__${source.sourceId}?q=${query}`)
@@ -72,8 +72,6 @@ export class SearchApiService {
           });
         })
       );
-
-    return result$;
   }
 
   private filter(query: string, data: SearchResult): SearchResult {

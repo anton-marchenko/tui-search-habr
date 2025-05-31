@@ -2,19 +2,15 @@ import { inject, Injectable } from '@angular/core';
 import { from, merge, Observable, of } from 'rxjs';
 import { SearchApiService } from './search-api.service';
 import { catchError, mergeMap, scan, switchMap } from 'rxjs/operators';
-import { SearchResult, SearchResultState } from '../search.model';
-import { ExtraSearchPriorityService } from './extra-search-priority.service';
+import { SearchResult, SearchResultState } from './search.model';
+import { EXTRA_SEARCH_SOURCES } from './search-sources.provider';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class SearchService {
   public readonly minQueryLength = 2;
 
   private readonly searchApiService = inject(SearchApiService);
-  private readonly extraSearchPriorityService = inject(
-    ExtraSearchPriorityService
-  );
+  private readonly extraSearchSources$ = inject(EXTRA_SEARCH_SOURCES);
 
   public makeSearch$(query: string): Observable<SearchResultState> {
     if (!this.canSearchStart(query)) {
@@ -56,24 +52,18 @@ export class SearchService {
     const initialValue: SearchResult = {};
 
     return this.getExtraSearchResults$(query).pipe(
-      scan((acc, curr) => {
-        return {
-          ...acc,
-          ...curr,
-        };
-      }, initialValue)
+      scan((acc, curr) => ({
+        ...acc,
+        ...curr,
+      }), initialValue)
     );
   }
 
   private getExtraSearchResults$(query: string) {
-    const service$ = this.extraSearchPriorityService.extraSearchServices$;
-
-    return service$.pipe(
-      switchMap(services => {
-        return from(services);
-      }),
-      mergeMap(service =>
-        this.searchApiService.makeSearchFromExtraService$(query, service)
+    return this.extraSearchSources$.pipe(
+      switchMap(sources => from(sources)),
+      mergeMap(source =>
+        this.searchApiService.makeSearchFromExtraSource$(query, source)
       )
     );
   }

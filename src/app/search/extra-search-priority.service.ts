@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, map, of, ReplaySubject, timeout } from 'rxjs';
-import { ExtraSearchSourceDto } from '../search.model';
+import { ExtraSearchSourceDto } from './search.model';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
