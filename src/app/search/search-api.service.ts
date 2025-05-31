@@ -6,7 +6,7 @@ import {
   SearchItemDto,
 } from '../search.model';
 import { TUI_DEFAULT_MATCHER } from '@taiga-ui/cdk';
-import { catchError, delay, map, of, startWith } from 'rxjs';
+import { catchError, map, of, startWith } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 type MainSearchResultDto = Record<string, readonly SearchItemDto[]>;
@@ -36,7 +36,6 @@ export class SearchApiService {
     return this.http
       .get<MainSearchResultDto>(`${this.baseUrl}/main-search?q=${query}`)
       .pipe(
-        delay(3000),
         map(result =>
           Object.entries(result).reduce(
             (acc, [key, data]) => ({
@@ -60,16 +59,9 @@ export class SearchApiService {
         SearchItemDto[]
       >(`${this.baseUrl}/extra-search__${source.sourceId}?q=${query}`)
       .pipe(
-        delay(100),
-        map(value => {
-          if (source.sourceId === 'code') {
-            throw new Error('xxx');
-          }
-
-          return {
-            [source.name]: value.map(data => ({ data })),
-          };
-        }),
+        map(value => ({
+          [source.name]: value.map(data => ({ data })),
+        })),
         startWith<SearchResult>({
           [source.name]: [LOADING_ITEM],
         }),

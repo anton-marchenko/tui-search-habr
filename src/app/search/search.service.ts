@@ -67,16 +67,13 @@ export class SearchService {
 
   private getExtraSearchResults$(query: string) {
     const service$ = this.extraSearchPriorityService.extraSearchServices$;
-    const concurrentLimit = 10;
 
     return service$.pipe(
       switchMap(services => {
         return from(services);
       }),
-      mergeMap(
-        service =>
-          this.searchApiService.makeSearchFromExtraService$(query, service),
-        concurrentLimit
+      mergeMap(service =>
+        this.searchApiService.makeSearchFromExtraService$(query, service)
       )
     );
   }

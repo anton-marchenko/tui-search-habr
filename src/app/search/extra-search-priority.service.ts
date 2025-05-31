@@ -10,7 +10,6 @@ export class ExtraSearchPriorityService {
   private readonly baseUrl =
     'https://my-json-server.typicode.com/anton-marchenko/tui-search-jsons';
   private readonly http = inject(HttpClient);
-  private readonly searchTimeout = 500;
   private cached = false;
 
   private readonly sourceSub = new ReplaySubject<ExtraSearchServiceDto[]>(1);
@@ -32,9 +31,9 @@ export class ExtraSearchPriorityService {
     return this.http
       .get<ExtraSearchServiceDto[]>(`${this.baseUrl}/extra-search-sources`)
       .pipe(
-        timeout(this.searchTimeout), // backend SLA
+        timeout(900), // Отменит запрос если он дольше 900мс
         map(items => items.sort((a, b) => a.priority - b.priority)),
-        catchError(() => of<ExtraSearchServiceDto[]>([])) // graceful degradation (extra search just will be hidden)
+        catchError(() => of<ExtraSearchServiceDto[]>([])) // отключит extra-search
       );
   }
 }

@@ -1,4 +1,4 @@
-import { AsyncPipe, JsonPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TuiTextfield } from '@taiga-ui/core';
@@ -27,9 +27,8 @@ import { SearchService } from './search.service';
 })
 export class SearchComponent {
   private searchService = inject(SearchService);
-  private readonly debounceTimeBeforeSearchRequest = 300;
 
-  protected readonly popular = ['Anton', 'Taiga', 'Git'];
+  protected readonly popular = ['Ant', 'Taiga', 'Git'];
 
   protected readonly control = new FormControl('');
 
@@ -41,13 +40,13 @@ export class SearchComponent {
           return true;
         }
 
-        return query.length > 2;
+        return query.length > this.searchService.minQueryLength;
       })
     );
 
   protected readonly resultState$: Observable<SearchResultState> =
     this.control.valueChanges.pipe(
-      debounceTime(this.debounceTimeBeforeSearchRequest),
+      debounceTime(300),
       switchMap(query => {
         if (!query) {
           return of(null);
