@@ -52,10 +52,13 @@ export class SearchService {
     const initialValue: SearchResult = {};
 
     return this.getExtraSearchResults$(query).pipe(
-      scan((acc, curr) => ({
-        ...acc,
-        ...curr,
-      }), initialValue)
+      scan(
+        (acc, curr) => ({
+          ...acc,
+          ...curr,
+        }),
+        initialValue
+      )
     );
   }
 

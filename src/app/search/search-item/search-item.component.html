@@ -7,8 +7,7 @@
   </div>
 } @else {
   <a tuiCell [href]="item.data?.href">
-    <tui-avatar
-      [src]="item.data?.icon || '@tui.file'"/>
+    <tui-avatar [src]="item.data?.icon || '@tui.file'" />
     <span tuiTitle>
       <span>{{ item.data?.title }}</span>
       <span tuiSubtitle>{{ item.data?.subtitle }}</span>
