@@ -15,14 +15,12 @@ import { ExtraSearchPriorityService } from './search/extra-search-priority.servi
   selector: 'app-root',
   imports: [RouterOutlet, TuiRoot, TuiAvatar, TuiNavigation, SearchComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   private readonly extraSearchPriorityService = inject(
     ExtraSearchPriorityService
   );
-  title = 'search';
 
   ngOnInit(): void {
     this.extraSearchPriorityService.loadDataOnce();
