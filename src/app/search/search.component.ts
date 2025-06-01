@@ -62,8 +62,8 @@ export class SearchComponent implements OnInit {
       switchMap(query => {
         if (!query && this.control.value) {
           /**
-           * Покажем сообщение о том что нужно продолжить печатать запрос
-           * для не пустой поисковой строки
+           * Для не пустой поисковой строки:
+           * покажем сообщение о том что нужно продолжить печатать запрос
            */
           return of({
             status: 'pendingTyping',
@@ -72,7 +72,7 @@ export class SearchComponent implements OnInit {
 
         if (!query) {
           /**
-           * Для пустой поисковой строки
+           * Для пустой поисковой строки:
            * покажем блок популярных запросов и истории поиска
            */
           return of({ status: 'ready', data: null } as const);
