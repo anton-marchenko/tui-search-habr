@@ -5,20 +5,14 @@
     [tuiInputSearch]="search"
     [(tuiInputSearchOpen)]="open" />
   <ng-template #search>
-    @let canShowSearchResults = canShowSearchResults$ | async;
-    <!-- { status: 'ok', data: null} состояние в котором показываем популярные фильтры если поиск пустой -->
-    @let resultState = (resultState$ | async) ?? { status: 'ok', data: null };
+    @let resultState = (resultState$ | async) ?? { status: 'ready', data: null };
 
-    @if (!canShowSearchResults) {
-      <div class="search-content">
-        <span class="search-content-inner">
-          Please enter 3 or more characters
-        </span>
-      </div>
+    @if (resultState.status === 'tooShortQuery') {
+      <app-search-message>Enter 3 or more characters</app-search-message>
     } @else if (resultState.status === 'error') {
-      <div class="search-content">
-        <span class="search-content-inner">An error occured</span>
-      </div>
+      <app-search-message>An error occured</app-search-message>
+    } @else if (resultState.status === 'pendingTyping') {
+      <app-search-message>Type something to start searching</app-search-message>
     } @else {
       <tui-search-results [results]="resultState.data">
         <tui-search-history [popular]="popular" />

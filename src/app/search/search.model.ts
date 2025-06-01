@@ -19,6 +19,7 @@ export interface SearchItemResult {
 export type SearchResult = Record<string, readonly SearchItemResult[]>;
 
 export type SearchResultState =
-  | { status: 'ok'; data: SearchResult | null }
-  | { status: 'error' }
-  | null;
+  | { status: 'ready'; data: SearchResult | null }
+  | { status: 'error' } // Ошибка основного поиска
+  | { status: 'pendingTyping' } // Ожидание ввода пользователем поискового запроса
+  | { status: 'tooShortQuery' }; // Введен слишком короткий поисковый запрос

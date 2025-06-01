@@ -7,16 +7,10 @@ import { EXTRA_SEARCH_SOURCES } from './search-sources.provider';
 
 @Injectable()
 export class SearchService {
-  public readonly minQueryLength = 2;
-
   private readonly searchApiService = inject(SearchApiService);
   private readonly extraSearchSources$ = inject(EXTRA_SEARCH_SOURCES);
 
   public makeSearch$(query: string): Observable<SearchResultState> {
-    if (!this.canSearchStart(query)) {
-      return of(null);
-    }
-
     const mainSearch$ = this.searchApiService.makeMainSearch$(query);
     const extraSearch$ = this.makeExtraSearch$(query);
 
@@ -24,27 +18,23 @@ export class SearchService {
 
     return merge(...[mainSearch$, extraSearch$]).pipe(
       scan(
-        (acc, curr) => {
-          return {
-            ...acc,
-            data: {
-              ...acc.data,
-              ...curr,
-            },
-          };
-        },
+        (acc, curr) => ({
+          ...acc,
+          data: {
+            ...acc.data,
+            ...curr,
+          },
+        }),
         {
-          status: 'ok',
+          status: 'ready',
           data: initialValue,
         } as const
       ),
-      catchError(() => {
-        // catch main search error
-        // and hide all results
-        return of({
+      catchError(() =>
+        of({
           status: 'error',
-        } as const);
-      })
+        } as const)
+      )
     );
   }
 
@@ -69,9 +59,5 @@ export class SearchService {
         this.searchApiService.makeSearchFromExtraSource$(query, source)
       )
     );
-  }
-
-  private canSearchStart(query = ''): boolean {
-    return query.length > this.minQueryLength;
   }
 }

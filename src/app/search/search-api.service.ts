@@ -6,7 +6,7 @@ import {
   SearchItemDto,
 } from './search.model';
 import { TUI_DEFAULT_MATCHER } from '@taiga-ui/cdk';
-import { catchError, delay, map, of, startWith } from 'rxjs';
+import { catchError, map, of, startWith } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { API_BASE_URL } from './search.constants';
 
@@ -59,7 +59,6 @@ export class SearchApiService {
         SearchItemDto[]
       >(`${this.baseUrl}/extra-search__${source.sourceId}?q=${query}`)
       .pipe(
-        delay(2000),
         map(value => ({
           [source.sectionName]: value.map(data => ({ data })),
         })),
