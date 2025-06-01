@@ -9,13 +9,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TuiTextfield } from '@taiga-ui/core';
 import { TuiSearchResults } from '@taiga-ui/experimental';
 import { TuiInputSearch, TuiNavigation } from '@taiga-ui/layout';
-import {
-  debounceTime,
-  Observable,
-  of,
-  startWith,
-  switchMap,
-} from 'rxjs';
+import { debounceTime, Observable, of, startWith, switchMap } from 'rxjs';
 import { SearchItemComponent } from './search-item/search-item.component';
 import { SearchResultState } from './search.model';
 import { SearchService } from './search.service';
@@ -37,10 +31,9 @@ import { SearchMessageComponent } from './search-message/search-message.componen
     TuiSearchResults,
     TuiTextfield,
     SearchItemComponent,
-    SearchMessageComponent
+    SearchMessageComponent,
   ],
   templateUrl: './search.component.html',
-  styleUrl: './search.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [EXTRA_SEARCH_SOURCES_PROVIDER, SearchService],
 })
@@ -56,6 +49,7 @@ export class SearchComponent implements OnInit {
 
   protected readonly resultState$: Observable<SearchResultState> =
     this.control.valueChanges.pipe(
+      debounceTime(200),
       /**
        * Хотим обработать состояние неактивного поиска
        * в момент когда ставим курсор в поисковую строку.
@@ -65,7 +59,6 @@ export class SearchComponent implements OnInit {
        * 2) в поисковой строке уже есть значение от предыдущих поисков
        */
       startWith(''),
-      // debounceTime(300),
       switchMap(query => {
         if (!query && this.control.value) {
           /**
