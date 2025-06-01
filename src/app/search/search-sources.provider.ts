@@ -22,6 +22,9 @@ function extraSearchSourcesFactory(): Observable<ExtraSearchSourceDto[]> {
       timeout(900), // Отменит запрос если он дольше 900мс
       map(items => items.sort((a, b) => a.priority - b.priority)),
       catchError(() => of<ExtraSearchSourceDto[]>([])), // отключит extra-search
-      shareReplay(1)
+      shareReplay({
+        bufferSize: 1,
+        refCount: true,
+      })
     );
 }
