@@ -79,8 +79,8 @@ export class SearchComponent implements OnInit {
 
         if (!query) {
           /**
-           * Покажем блок популярных запросов
-           * для пустой поисковой строки
+           * Для пустой поисковой строки
+           * покажем блок популярных запросов и истории поиска
            */
           return of({ status: 'ready', data: null } as const);
         }
