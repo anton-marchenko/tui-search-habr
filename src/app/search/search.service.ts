@@ -1,14 +1,21 @@
 import { inject, Injectable } from '@angular/core';
 import { from, merge, Observable, of } from 'rxjs';
 import { SearchApiService } from './search-api.service';
-import { catchError, mergeMap, scan, switchMap } from 'rxjs/operators';
+import {
+  catchError,
+  mergeMap,
+  scan,
+  shareReplay,
+  switchMap,
+} from 'rxjs/operators';
 import { SearchResult, SearchResultState } from './search.model';
-import { EXTRA_SEARCH_SOURCES } from './search-sources.provider';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class SearchService {
   private readonly searchApiService = inject(SearchApiService);
-  private readonly extraSearchSources$ = inject(EXTRA_SEARCH_SOURCES);
+  private readonly extraSearchSources$ = this.searchApiService
+    .getExtraSearchSources$()
+    .pipe(shareReplay(1));
 
   public makeSearch$(query: string): Observable<SearchResultState> {
     const mainSearch$ = this.searchApiService.makeMainSearch$(query);
@@ -36,6 +43,10 @@ export class SearchService {
         } as const)
       )
     );
+  }
+
+  public loadExtraSearchSources(): void {
+    this.extraSearchSources$.subscribe();
   }
 
   private makeExtraSearch$(query: string) {

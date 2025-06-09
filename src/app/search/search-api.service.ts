@@ -6,9 +6,8 @@ import {
   SearchItemDto,
 } from './search.model';
 import { TUI_DEFAULT_MATCHER } from '@taiga-ui/cdk';
-import { catchError, map, of, startWith } from 'rxjs';
+import { catchError, map, of, startWith, timeout } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { API_BASE_URL } from './search.constants';
 
 type MainSearchResultDto = Record<string, readonly SearchItemDto[]>;
 
@@ -29,7 +28,8 @@ const MAIN_SEARCH_LOADING_STATE: SearchResult = {
   providedIn: 'root',
 })
 export class SearchApiService {
-  private readonly baseUrl = API_BASE_URL;
+  private readonly baseUrl =
+    'https://my-json-server.typicode.com/anton-marchenko/tui-search-jsons';
   private readonly http = inject(HttpClient);
 
   makeMainSearch$(query: string) {
@@ -70,6 +70,16 @@ export class SearchApiService {
             [source.sectionName]: [],
           });
         })
+      );
+  }
+
+  public getExtraSearchSources$() {
+    return this.http
+      .get<ExtraSearchSourceDto[]>(`${this.baseUrl}/extra-search-sources`)
+      .pipe(
+        timeout(900), // Отменит запрос если он дольше 900мс
+        map(items => items.sort((a, b) => a.priority - b.priority)), // сразу отсортируем как будут в выдаче выводиться секции
+        catchError(() => of<ExtraSearchSourceDto[]>([])) // отключит все внешние поиски в случае ошибки
       );
   }
 

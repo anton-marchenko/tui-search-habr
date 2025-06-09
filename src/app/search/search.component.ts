@@ -13,10 +13,6 @@ import { debounceTime, Observable, of, startWith, switchMap } from 'rxjs';
 import { SearchItemComponent } from './search-item/search-item.component';
 import { SearchResultState } from './search.model';
 import { SearchService } from './search.service';
-import {
-  EXTRA_SEARCH_SOURCES,
-  EXTRA_SEARCH_SOURCES_PROVIDER,
-} from './search-sources.provider';
 import { SearchMessageComponent } from './search-message/search-message.component';
 
 @Component({
@@ -35,11 +31,9 @@ import { SearchMessageComponent } from './search-message/search-message.componen
   ],
   templateUrl: './search.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [EXTRA_SEARCH_SOURCES_PROVIDER, SearchService],
 })
 export class SearchComponent implements OnInit {
   private readonly searchService = inject(SearchService);
-  private readonly extraSearchSources$ = inject(EXTRA_SEARCH_SOURCES);
 
   protected readonly popular = ['Ant', 'Taiga', 'Git'];
 
@@ -97,7 +91,7 @@ export class SearchComponent implements OnInit {
      * чтобы когда мы начали вводить свой первый поисковый запрос
      * источники уже были подгружены
      */
-    this.extraSearchSources$.subscribe();
+    this.searchService.loadExtraSearchSources();
   }
 
   private canSearchStart(query = ''): boolean {
