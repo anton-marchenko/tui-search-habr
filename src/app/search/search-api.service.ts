@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import {
   ExtraSearchSourceDto,
-  SearchItemResult,
   SearchResult,
   SearchItemDto,
 } from './search.model';
@@ -10,19 +9,6 @@ import { catchError, map, of, startWith, timeout } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 type MainSearchResultDto = Record<string, readonly SearchItemDto[]>;
-
-const LOADING_ITEM: SearchItemResult = {
-  loading: true,
-  data: {
-    title: 'xxxxxxxxxxxx',
-    href: '',
-  },
-};
-
-const MAIN_SEARCH_LOADING_STATE: SearchResult = {
-  Posts: [LOADING_ITEM],
-  Articles: [LOADING_ITEM],
-};
 
 @Injectable({
   providedIn: 'root',
@@ -46,7 +32,10 @@ export class SearchApiService {
           )
         ),
         map(result => this.filter(query, result)), // search immitation (because json-server can only filter arrays, not objects)
-        startWith<SearchResult>(MAIN_SEARCH_LOADING_STATE)
+        startWith<SearchResult>({
+          Posts: [{ loading: true }],
+          Articles: [{ loading: true }],
+        })
       );
   }
 
@@ -63,7 +52,7 @@ export class SearchApiService {
           [source.sectionName]: value.map(data => ({ data })),
         })),
         startWith<SearchResult>({
-          [source.sectionName]: [LOADING_ITEM],
+          [source.sectionName]: [{ loading: true }],
         }),
         catchError(() => {
           return of<SearchResult>({
