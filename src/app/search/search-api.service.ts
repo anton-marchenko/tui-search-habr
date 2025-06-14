@@ -31,7 +31,11 @@ export class SearchApiService {
             {} as SearchResult
           )
         ),
-        map(result => this.filter(query, result)), // search immitation (because json-server can only filter arrays, not objects)
+        // иммитируем бековую фильтрацию
+        // потому что json-server не умеет по вложенным объектам фильровать
+        map(result => this.filter(query, result)),
+        // При старте основного поиска рисуем скелетоны
+        // для секций постов и статей
         startWith<SearchResult>({
           Posts: [{ loading: true }],
           Articles: [{ loading: true }],
@@ -48,12 +52,15 @@ export class SearchApiService {
         SearchItemDto[]
       >(`${this.baseUrl}/extra-search__${source.sourceId}?q=${query}`)
       .pipe(
+        // добавим результат в секцию по ее имени
         map(value => ({
           [source.sectionName]: value.map(data => ({ data })),
         })),
+        // отрисуем скелетон
         startWith<SearchResult>({
           [source.sectionName]: [{ loading: true }],
         }),
+        // скроем секцию в случае ошибки
         catchError(() => {
           return of<SearchResult>({
             [source.sectionName]: [],
@@ -66,9 +73,12 @@ export class SearchApiService {
     return this.http
       .get<ExtraSearchSourceDto[]>(`${this.baseUrl}/extra-search-sources`)
       .pipe(
-        timeout(900), // Отменит запрос если он дольше 900мс
-        map(items => items.sort((a, b) => a.priority - b.priority)), // сразу отсортируем как будут в выдаче выводиться секции
-        catchError(() => of<ExtraSearchSourceDto[]>([])) // отключит все внешние поиски в случае ошибки
+        // Отменим слишком долгий запрос (дольше 900мс)
+        timeout(900),
+        // сразу отсортируем порядок секций
+        map(items => items.sort((a, b) => a.priority - b.priority)),
+        // отключим вообще внешние поиски в случае ошибки
+        catchError(() => of<ExtraSearchSourceDto[]>([]))
       );
   }
 

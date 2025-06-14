@@ -39,8 +39,6 @@ export class SearchComponent implements OnInit {
 
   protected readonly control = new FormControl('');
 
-  private readonly minQueryLength = 3;
-
   protected readonly resultState$: Observable<SearchResultState> =
     this.control.valueChanges.pipe(
       debounceTime(200),
@@ -108,9 +106,5 @@ export class SearchComponent implements OnInit {
      * источники уже были подгружены
      */
     this.searchService.loadExtraSearchSources();
-  }
-
-  private canSearchStart(query = ''): boolean {
-    return query.length >= this.minQueryLength;
   }
 }

@@ -23,7 +23,9 @@ export class SearchService {
 
     const initialValue: SearchResult = {};
 
+    // смержим потоки данных основного и внешних поисков
     return merge(...[mainSearch$, extraSearch$]).pipe(
+      // соберем данные в единый объект - результат поисковой выдачи
       scan(
         (acc, curr) => ({
           ...acc,
@@ -37,6 +39,7 @@ export class SearchService {
           data: initialValue,
         } as const
       ),
+      // обработаем сценарий ошибки основного поиска
       catchError(() =>
         of({
           status: 'error',
@@ -53,6 +56,8 @@ export class SearchService {
     const initialValue: SearchResult = {};
 
     return this.getExtraSearchResults$(query).pipe(
+      // из нескольких потоков
+      // соберем результаты в единый объект
       scan(
         (acc, curr) => ({
           ...acc,
@@ -64,8 +69,11 @@ export class SearchService {
   }
 
   private getExtraSearchResults$(query: string) {
+    // берем конфиг внешних поисков
     return this.extraSearchSources$.pipe(
+      // формируем пачку запросов на бек
       switchMap(sources => from(sources)),
+      // отправим пачку запросов параллельно
       mergeMap(source =>
         this.searchApiService.makeSearchFromExtraSource$(query, source)
       )
