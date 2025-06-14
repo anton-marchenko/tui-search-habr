@@ -54,14 +54,30 @@ export class SearchComponent implements OnInit {
        */
       startWith(''),
       switchMap(query => {
+        const state = {
+          pendingTyping: {
+            status: 'pendingTyping',
+          },
+          /**
+           * Так работает компонент tui-search-results.
+           * Если поле ввода пустое, а в results передать data: null
+           * то отобразится блок с популярными и историей.
+           */
+          historyAndPopular: { status: 'ready', data: null },
+          tooShortQuery: { status: 'tooShortQuery' },
+        } as const;
+
         if (!query && this.control.value) {
           /**
            * Для не пустой поисковой строки:
-           * покажем сообщение о том что нужно продолжить печатать запрос
+           * покажем сообщение о том что нужно продолжить печатать запрос.
+           *
+           * Сработает при сценарии:
+           * - что-то вбили в поиск,
+           * - ушли из поисковой строки
+           * - и снова вернулись в нее
            */
-          return of({
-            status: 'pendingTyping',
-          } as const);
+          return of(state.pendingTyping);
         }
 
         if (!query) {
@@ -69,14 +85,14 @@ export class SearchComponent implements OnInit {
            * Для пустой поисковой строки:
            * покажем блок популярных запросов и истории поиска
            */
-          return of({ status: 'ready', data: null } as const);
+          return of(state.historyAndPopular);
         }
 
-        if (!this.canSearchStart(query)) {
+        if (query.length < 3) {
           /**
            * Покажем сообщение о том что слишком короткий поисковый запрос
            */
-          return of({ status: 'tooShortQuery' } as const);
+          return of(state.tooShortQuery);
         }
 
         return this.searchService.makeSearch$(query);
