@@ -24,7 +24,7 @@ export class SearchService {
     const initialValue: SearchResult = {};
 
     // смержим потоки данных основного и внешних поисков
-    return merge(...[mainSearch$, extraSearch$]).pipe(
+    return merge(mainSearch$, extraSearch$).pipe(
       // соберем данные в единый объект - результат поисковой выдачи
       scan(
         (acc, curr) => ({
